@@ -61,5 +61,18 @@ python train_probe_cauldron.py --features runs/cauldron-001 --out runs/probe-001
 ### Scoring API
 
 `api_server.py` serves the model and the Cauldron probe over HTTP with an API key; see
-[API.md](API.md). Start it with `JEVOMIR_API_KEY=<secret> python api_server.py --probe runs/probe-002`
-and expose the local port with a tunnel such as `ngrok http 8100`.
+[API.md](API.md). The trained probe (probe-002) is committed in `artifacts/cauldron`, so no
+training is needed; the model (Qwen3.5-4B @ `851bf6e`) is downloaded from Hugging Face on first
+start. It needs a CUDA GPU that holds the 4B model in bf16 (developed on an H100).
+
+```bash
+uv venv .venv && uv pip install -r requirements.txt
+uv pip install fastapi uvicorn python-multipart    # API-only dependencies
+uv pip install flash-linear-attention              # optional: fast Qwen3.5 kernels (needs python3.x-dev)
+export JEVOMIR_API_KEY=$(python -c "import secrets; print('jev_' + secrets.token_urlsafe(32))")
+echo "$JEVOMIR_API_KEY"                             # the key clients send
+python api_server.py --probe artifacts/cauldron     # http://127.0.0.1:8100
+```
+
+To reach it from other machines, expose the port with a tunnel such as `ngrok http 8100`.
+A free ngrok tunnel drops connections above about 100 requests a minute.
