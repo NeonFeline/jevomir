@@ -63,3 +63,6 @@ python train_probe_cauldron.py --features runs/cauldron-001 --out runs/probe-001
 `api_server.py` serves the model and the Cauldron probe over HTTP with an API key; see
 [API.md](API.md). Start it with `JEVOMIR_API_KEY=<secret> python api_server.py --probe runs/probe-002`
 and expose the local port with a tunnel such as `ngrok http 8100`.
+
+`web/` is a browser UI for the API (image upload, question, options, results); run
+`python web/server.py` and see [web/README.md](web/README.md) for how it integrates.

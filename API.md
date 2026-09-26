@@ -7,7 +7,8 @@ forward pass of Qwen3.5-4B (no text generation) and returns:
 - `prediction`, the most likely option,
 - `calibrated_p_correct`, a probe's estimate that the prediction is correct.
 
-Interactive schema: `GET {BASE_URL}/docs`. Server code: `api_server.py`.
+Interactive schema: `GET {BASE_URL}/docs`. Server code: `api_server.py`. Browser UI:
+[web/](web/README.md).
 
 ## Authentication
 
