@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jevomir</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1c1b18; --muted: #6b6860; --line: #e2dfd7;
+  --accent: #2f6fdf; --accent-ink: #fff; --win: #1f9d6b; --bar: #d9d6cd; --err: #c4412f;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151513; --panel: #1f1f1c; --ink: #ecebe6; --muted: #9a978e; --line: #33322e;
+    --accent: #5b8ff0; --accent-ink: #0d0d0c; --win: #3cc48f; --bar: #3a3935; --err: #ef6d5a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+main { max-width: 60rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+h1 { margin: 0; font-size: 1.6rem; letter-spacing: -.02em; }
+#model { color: var(--muted); font-size: .85rem; font-family: ui-monospace, monospace; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; }
+h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 .6rem; font-weight: 600; }
+.field + .field { margin-top: 1.1rem; }
+textarea, input[type=text] { width: 100%; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: .55rem .7rem; }
+textarea:focus, input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+textarea { resize: vertical; min-height: 4.5rem; }
+.drop { display: block; border: 1.5px dashed var(--line); border-radius: 10px; padding: 1rem; text-align: center; color: var(--muted); cursor: pointer; transition: border-color .15s, background .15s; }
+.drop.over, .drop:hover { border-color: var(--accent); }
+.thumbs { display: flex; gap: .6rem; margin-top: .6rem; flex-wrap: wrap; }
+.thumb { position: relative; width: 120px; height: 120px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb button { position: absolute; top: 4px; right: 4px; border: 0; border-radius: 50%; width: 24px; height: 24px; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; line-height: 1; }
+.opt { display: flex; gap: .4rem; align-items: flex-start; margin-bottom: .6rem; }
+.opt .fields { flex: 1; display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.opt .fields .desc { font-size: .85rem; padding: .4rem .7rem; }
+.opt .letter { padding-top: .55rem; flex: none; text-align: center; font-weight: 600; color: var(--muted); font-family: ui-monospace, monospace; }
+.opt button, .ghost { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; padding: .45rem .7rem; cursor: pointer; font: inherit; }
+.opt button:hover, .ghost:hover { color: var(--ink); border-color: var(--muted); }
+.row { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: .7rem 1.4rem; font: inherit; font-weight: 600; cursor: pointer; }
+.primary:disabled { opacity: .5; cursor: default; }
+.hint { color: var(--muted); font-size: .8rem; }
+#result { margin-top: 1rem; }
+.answer { font-size: 1.5rem; font-weight: 650; margin: 0 0 .2rem; }
+.conf { color: var(--muted); margin-bottom: 1rem; }
+.conf b { color: var(--ink); }
+.bar-row { margin-bottom: .55rem; }
+.bar-label { display: flex; justify-content: space-between; gap: 1rem; font-size: .9rem; }
+.bar-label small { display: block; color: var(--muted); font-weight: 400; }
+.answer-desc { color: var(--muted); margin: 0 0 .4rem; }
+.bar-label span:last-child { font-variant-numeric: tabular-nums; font-family: ui-monospace, monospace; }
+.bar { height: 8px; background: var(--bar); border-radius: 4px; overflow: hidden; margin-top: 3px; }
+.bar i { display: block; height: 100%; background: var(--muted); border-radius: 4px; }
+.bar-row.win .bar i { background: var(--win); }
+.bar-row.win .bar-label { font-weight: 600; }
+.meta { color: var(--muted); font-size: .8rem; font-family: ui-monospace, monospace; margin-top: .8rem; }
+.error { color: var(--err); white-space: pre-wrap; }
+details { margin-top: .8rem; }
+summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
+pre { font-size: .75rem; overflow: auto; background: var(--bg); padding: .7rem; border-radius: 8px; max-height: 20rem; }
+.examples { display: flex; gap: .4rem; flex-wrap: wrap; }
+.examples button { font-size: .8rem; padding: .25rem .6rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Jevomir</h1>
+    <span id="model">łączenie z API…</span>
+  </header>
+
+  <form id="form" class="grid">
+    <section class="panel">
+      <h2>Zdjęcia (1–2)</h2>
+      <label class="drop" id="drop">
+        Przeciągnij, wklej (Ctrl+V) albo kliknij, żeby wybrać
+        <input type="file" id="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+      </label>
+      <div class="thumbs" id="thumbs"></div>
+      <p class="hint">JPEG, PNG lub WebP, do 10 MB każde.</p>
+    </section>
+
+    <section class="panel">
+      <div class="field">
+        <h2><label for="question">Pytanie</label></h2>
+        <textarea id="question" maxlength="2000" required placeholder="Is there a metal sphere?"></textarea>
+      </div>
+      <div class="field">
+        <h2>Opcje (2–16)</h2>
+        <p class="hint">Opis jest opcjonalny; model dostaje „etykieta: opis” (razem do 300 znaków).</p>
+        <div id="options"></div>
+        <div class="row">
+          <button type="button" class="ghost" id="add">+ opcja</button>
+          <div class="examples">
+            <button type="button" class="ghost" data-preset="Yes|No">Tak / Nie</button>
+            <button type="button" class="ghost" data-preset="Yes|No|Cannot tell:The image does not show enough to decide">+ nie wiadomo</button>
+          </div>
+        </div>
+      </div>
+      <div class="field row">
+        <button class="primary" id="go">Zapytaj</button>
+        <span class="hint">Ctrl+Enter</span>
+      </div>
+    </section>
+  </form>
+
+  <section class="panel" id="result" hidden></section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const MAX_IMAGES = 2, MAX_BYTES = 10 * 1024 * 1024;
+let images = [];  // {file, url}
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// --- model info ---
+if (location.protocol === 'file:') {
+  document.querySelector('main').insertAdjacentHTML('afterbegin',
+    '<p class="panel error">Strona otwarta jako plik — nie połączy się z API. Uruchom <code>python web/server.py</code> i wejdź na <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a>.</p>');
+}
+fetch('/api/info').then(r => r.json()).then(info => {
+  if (!info.model) throw new Error(info.detail || 'brak informacji o modelu');
+  $('model').textContent = `${info.model.source} · ${info.model.dtype} · probe ${info.probe?.run ?? '—'}`;
+}).catch(e => { $('model').textContent = 'API niedostępne: ' + e.message; });
+
+// --- images ---
+function addFiles(files) {
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    if (images.length >= MAX_IMAGES) { alert('Maksymalnie 2 zdjęcia.'); break; }
+    if (file.size > MAX_BYTES) { alert(`${file.name}: plik większy niż 10 MB.`); continue; }
+    images.push({ file, url: URL.createObjectURL(file) });
+  }
+  renderThumbs();
+}
+function renderThumbs() {
+  $('thumbs').innerHTML = images.map((im, i) =>
+    `<div class="thumb"><img src="${im.url}" alt=""><button type="button" data-i="${i}" aria-label="Usuń">×</button></div>`).join('');
+}
+$('thumbs').onclick = e => {
+  const i = e.target.dataset.i;
+  if (i === undefined) return;
+  URL.revokeObjectURL(images[i].url);
+  images.splice(i, 1);
+  renderThumbs();
+};
+$('file').onchange = e => { addFiles(e.target.files); e.target.value = ''; };
+const drop = $('drop');
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); };
+document.onpaste = e => { const f = [...e.clipboardData.files]; if (f.length) addFiles(f); };
+
+// --- options: {label, desc}; the API gets "label: desc" as the option text ---
+const optionText = o => o.desc ? `${o.label}: ${o.desc}` : o.label;
+function renderOptions(values) {
+  $('options').innerHTML = values.map((o, i) =>
+    `<div class="opt"><span class="letter">${String.fromCharCode(65 + i)}</span>
+     <div class="fields">
+       <input type="text" class="label" maxlength="300" value="${esc(o.label)}" placeholder="Opcja ${i + 1}">
+       <input type="text" class="desc" maxlength="300" value="${esc(o.desc)}" placeholder="Opis (opcjonalnie)">
+     </div>
+     <button type="button" data-rm="${i}" aria-label="Usuń opcję">×</button></div>`).join('');
+}
+const optionValues = () => [...$('options').querySelectorAll('.opt')].map(el => ({
+  label: el.querySelector('.label').value, desc: el.querySelector('.desc').value }));
+const blank = { label: '', desc: '' };
+$('options').onclick = e => {
+  const i = e.target.dataset.rm;
+  if (i === undefined) return;
+  const v = optionValues(); v.splice(i, 1); renderOptions(v.length ? v : [blank]);
+};
+$('add').onclick = () => {
+  const v = optionValues();
+  if (v.length >= 16) return alert('Maksymalnie 16 opcji.');
+  renderOptions([...v, blank]);
+  $('options').querySelector('.opt:last-child .label').focus();
+};
+const parsePreset = s => s.split('|').map(p => { const [label, desc = ''] = p.split(':'); return { label, desc }; });
+document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => renderOptions(parsePreset(b.dataset.preset)));
+renderOptions(parsePreset('Yes|No'));
+
+// --- submit ---
+const toDataURL = file => new Promise((ok, fail) => {
+  const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = fail; r.readAsDataURL(file);
+});
+const fmtErr = d => Array.isArray(d) ? d.map(x => `${(x.loc || []).join('.')}: ${x.msg}`).join('\n') : d;
+
+$('form').onsubmit = async e => {
+  e.preventDefault();
+  const question = $('question').value.trim();
+  const opts = optionValues().map(o => ({ label: o.label.trim(), desc: o.desc.trim() }))
+    .filter(o => o.label || o.desc).map(o => ({ label: o.label || o.desc, desc: o.label ? o.desc : '' }));
+  const options = opts.map(optionText);
+  const out = $('result');
+  const fail = msg => { out.hidden = false; out.innerHTML = `<p class="error">${esc(msg)}</p>`; };
+  if (!images.length) return fail('Dodaj przynajmniej jedno zdjęcie.');
+  if (!question) return fail('Wpisz pytanie.');
+  if (options.length < 2) return fail('Podaj co najmniej 2 opcje.');
+  const tooLong = opts.findIndex(o => optionText(o).length > 300);
+  if (tooLong >= 0) return fail(`Opcja ${String.fromCharCode(65 + tooLong)}: etykieta z opisem ma ponad 300 znaków.`);
+
+  $('go').disabled = true; $('go').textContent = 'Liczę…';
+  const t0 = performance.now();
+  try {
+    const body = { question, options, images: await Promise.all(images.map(im => toDataURL(im.file))) };
+    const r = await fetch('/api/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const text = await r.text();
+    let j; try { j = JSON.parse(text); } catch { throw new Error(`HTTP ${r.status}: ${text.slice(0, 300)}`); }
+    if (!r.ok) throw new Error(fmtErr(j.detail) || `HTTP ${r.status}`);
+    renderResult(j, opts, performance.now() - t0);
+  } catch (err) {
+    fail(err.message);
+  } finally {
+    $('go').disabled = false; $('go').textContent = 'Zapytaj';
+  }
+};
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('form').requestSubmit(); });
+
+function renderResult(j, opts, roundtripMs) {
+  const pct = p => (p * 100).toFixed(1) + '%';
+  const win = j.prediction.index;
+  const out = $('result');
+  out.hidden = false;
+  out.innerHTML = `
+    <h2>Odpowiedź</h2>
+    <p class="answer">${esc(j.prediction.letter)}. ${esc(opts[win].label)}</p>
+    ${opts[win].desc ? `<p class="answer-desc">${esc(opts[win].desc)}</p>` : ''}
+    <p class="conf">Szansa, że odpowiedź jest poprawna (skalibrowana): <b>${pct(j.calibrated_p_correct)}</b>
+      · surowe prawdopodobieństwo: ${pct(j.raw_confidence)}</p>
+    ${j.options.map((o, i) => `
+      <div class="bar-row${i === win ? ' win' : ''}">
+        <div class="bar-label"><span>${esc(o.letter)}. ${esc(opts[i].label)}${opts[i].desc ? `<small>${esc(opts[i].desc)}</small>` : ''}</span><span>${pct(o.probability)}</span></div>
+        <div class="bar"><i style="width:${(o.probability * 100).toFixed(2)}%"></i></div>
+      </div>`).join('')}
+    <p class="meta">forward ${(j.timing.forward_s * 1000).toFixed(0)} ms · serwer ${(j.timing.total_s * 1000).toFixed(0)} ms
+      · w obie strony ${roundtripMs.toFixed(0)} ms · ${j.input_tokens} tokenów</p>
+    <details><summary>Surowa odpowiedź JSON</summary><pre>${esc(JSON.stringify(j, null, 2))}</pre></details>`;
+  out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>
