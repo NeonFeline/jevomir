@@ -98,8 +98,11 @@ def main():
     print(f"stopped at epoch {epoch}, best val loss {best:.4f}")
     model.load_state_dict(best_state)
     model.eval()
+    # Score in chunks: one call over all rows exceeds 2**32 elements, where some CUDA kernels
+    # silently return garbage for the tail of the tensor (seen as AUROC 0.5 on the last shards).
     with torch.no_grad():
-        probe = torch.sigmoid(model(xs.to(device))).cpu().numpy()
+        probe = torch.cat([torch.sigmoid(model(xs[i:i + 8192].to(device))).cpu()
+                           for i in range(0, len(xs), 8192)]).numpy()
 
     labels = y.numpy()
     results = {"layers": layers, "holdout_subsets": args.holdout_subsets,

@@ -57,3 +57,9 @@ python download_cauldron.py
 CUDA_VISIBLE_DEVICES=0 python extract_cauldron.py --out runs/cauldron-001 --limit 50000 --batch 64 --workers 12
 python train_probe_cauldron.py --features runs/cauldron-001 --out runs/probe-001 --holdout-subsets vsr
 ```
+
+### Scoring API
+
+`api_server.py` serves the model and the Cauldron probe over HTTP with an API key; see
+[API.md](API.md). Start it with `JEVOMIR_API_KEY=<secret> python api_server.py --probe runs/probe-002`
+and expose the local port with a tunnel such as `ngrok http 8100`.
