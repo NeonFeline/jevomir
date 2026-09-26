@@ -7,3 +7,4 @@ artifacts/features_*.pt
 artifacts/**/features_*.pt
 .uv/
 web/.api-key
+tetris/.api-key
