@@ -234,7 +234,8 @@ def main():
     meta = [{k: v for k, v in r.items() if k not in ("resp_states", "prompt_states")} for r in records]
     max_tok = max(r["n_tokens"] for r in records)
     n_layers = len(args.layers)
-    resp = torch.zeros(len(records), n_layers, max_tok, 2048, dtype=torch.float16)
+    d_model = records[0]["prompt_states"].shape[-1]
+    resp = torch.zeros(len(records), n_layers, max_tok, d_model, dtype=torch.float16)
     for i, r in enumerate(records):
         t = r["resp_states"].shape[1]
         resp[i, :, :t] = r["resp_states"]
