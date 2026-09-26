@@ -1,0 +1,56 @@
+{
+  "task": "Does the image contain a cat? (Qwen2.5-VL-3B-Instruct, Oxford-IIIT Pets)",
+  "method": "small MLP probe over pooled answer-token + prompt hidden states from layers [5,11,17,23,29,35]; target = answer correctness; raw signal = jev = exp(mean log p_i)",
+  "clean": {
+    "test_accuracy_parseable": 0.9961874859834043,
+    "parse_ok_rate": 0.9908888936042786,
+    "raw_jev_ece": 0.324879267763653,
+    "probe_ece": 0.0024923191901465775,
+    "raw_jev_auroc": 0.3620388272373335,
+    "probe_auroc": 0.8589400640940752,
+    "raw_mean_conf": 0.6713082194328308,
+    "probe_mean_conf": 0.9984232187271118,
+    "mid_conf_raw": {
+      "n": 1311,
+      "mean_prob": 0.5031625628471375,
+      "empirical_accuracy": 0.9977116704805492
+    },
+    "mid_conf_probe": null
+  },
+  "blurred_hard": {
+    "test_accuracy_parseable": 0.9477434679334917,
+    "parse_ok_rate": 0.9355555772781372,
+    "raw_jev_ece": 0.24351721798509995,
+    "probe_ece": 0.030691887208231804,
+    "raw_jev_auroc": 0.41995386192754613,
+    "probe_auroc": 0.952032353611301,
+    "raw_mean_conf": 0.7042262554168701,
+    "probe_mean_conf": 0.9183736443519592,
+    "mid_conf_raw": {
+      "n": 564,
+      "mean_prob": 0.49296435713768005,
+      "empirical_accuracy": 0.9822695035460993
+    },
+    "mid_conf_probe": {
+      "n": 83,
+      "mean_prob": 0.4982972741127014,
+      "empirical_accuracy": 0.7469879518072289
+    }
+  },
+  "onepass": {
+    "onepass": {
+      "n_images": 1500,
+      "ensemble_accuracy": 0.9973333333333333,
+      "ensemble_raw_ece": 0.003943905047497537,
+      "ensemble_raw_brier": 0.0022738905056753035,
+      "ensemble_raw_auroc": 0.9918114973262032
+    },
+    "onepass_blur": {
+      "n_images": 1500,
+      "ensemble_accuracy": 0.9433333333333334,
+      "ensemble_raw_ece": 0.041536437265946,
+      "ensemble_raw_brier": 0.03849972878796474,
+      "ensemble_raw_auroc": 0.9488256079817087
+    }
+  }
+}

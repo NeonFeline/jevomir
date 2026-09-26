@@ -1,0 +1,1330 @@
+{
+  "n_train_pairs": 4185,
+  "n_test_pairs": 4210,
+  "n_train_images": 1350,
+  "n_val_images": 150,
+  "probe_arch": "12x Linear(2048->64) -> MLP(768-256-128-1)",
+  "accuracy": 0.9477434679334917,
+  "parse_ok_rate_test": 0.9355555772781372,
+  "raw_jev": {
+    "ece": 0.24351721798509995,
+    "brier": 0.1582058968415975,
+    "auroc": 0.41995386192754613,
+    "mean_conf": 0.7042262554168701,
+    "accuracy": 0.9477434679334917,
+    "bins": [
+      {
+        "lo": 0.0,
+        "hi": 0.06666666666666667,
+        "n": 0
+      },
+      {
+        "lo": 0.06666666666666667,
+        "hi": 0.13333333333333333,
+        "n": 0
+      },
+      {
+        "lo": 0.13333333333333333,
+        "hi": 0.2,
+        "n": 5,
+        "conf": 0.1883467733860016,
+        "acc": 0.8
+      },
+      {
+        "lo": 0.2,
+        "hi": 0.26666666666666666,
+        "n": 107,
+        "conf": 0.23815898597240448,
+        "acc": 0.9813084112149533
+      },
+      {
+        "lo": 0.26666666666666666,
+        "hi": 0.3333333333333333,
+        "n": 222,
+        "conf": 0.3031124770641327,
+        "acc": 0.990990990990991
+      },
+      {
+        "lo": 0.3333333333333333,
+        "hi": 0.4,
+        "n": 236,
+        "conf": 0.3663637340068817,
+        "acc": 0.9915254237288136
+      },
+      {
+        "lo": 0.4,
+        "hi": 0.4666666666666667,
+        "n": 221,
+        "conf": 0.43237900733947754,
+        "acc": 1.0
+      },
+      {
+        "lo": 0.4666666666666667,
+        "hi": 0.5333333333333333,
+        "n": 180,
+        "conf": 0.49893948435783386,
+        "acc": 0.9944444444444445
+      },
+      {
+        "lo": 0.5333333333333333,
+        "hi": 0.6,
+        "n": 163,
+        "conf": 0.5685092210769653,
+        "acc": 0.9447852760736196
+      },
+      {
+        "lo": 0.6,
+        "hi": 0.6666666666666666,
+        "n": 184,
+        "conf": 0.6352459192276001,
+        "acc": 0.9130434782608695
+      },
+      {
+        "lo": 0.6666666666666666,
+        "hi": 0.7333333333333333,
+        "n": 421,
+        "conf": 0.7078118324279785,
+        "acc": 0.9501187648456056
+      },
+      {
+        "lo": 0.7333333333333333,
+        "hi": 0.8,
+        "n": 628,
+        "conf": 0.7647066712379456,
+        "acc": 0.928343949044586
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.8666666666666667,
+        "n": 881,
+        "conf": 0.8368960618972778,
+        "acc": 0.9137343927355278
+      },
+      {
+        "lo": 0.8666666666666667,
+        "hi": 0.9333333333333333,
+        "n": 690,
+        "conf": 0.8938851356506348,
+        "acc": 0.9434782608695652
+      },
+      {
+        "lo": 0.9333333333333333,
+        "hi": 1.0,
+        "n": 272,
+        "conf": 0.946276068687439,
+        "acc": 0.9779411764705882
+      }
+    ]
+  },
+  "probe": {
+    "ece": 0.030691887208231804,
+    "brier": 0.033837626016004985,
+    "auroc": 0.952032353611301,
+    "mean_conf": 0.9183736443519592,
+    "accuracy": 0.9477434679334917,
+    "bins": [
+      {
+        "lo": 0.0,
+        "hi": 0.06666666666666667,
+        "n": 0
+      },
+      {
+        "lo": 0.06666666666666667,
+        "hi": 0.13333333333333333,
+        "n": 61,
+        "conf": 0.1167210042476654,
+        "acc": 0.08196721311475409
+      },
+      {
+        "lo": 0.13333333333333333,
+        "hi": 0.2,
+        "n": 54,
+        "conf": 0.1590181291103363,
+        "acc": 0.3888888888888889
+      },
+      {
+        "lo": 0.2,
+        "hi": 0.26666666666666666,
+        "n": 25,
+        "conf": 0.23208406567573547,
+        "acc": 0.68
+      },
+      {
+        "lo": 0.26666666666666666,
+        "hi": 0.3333333333333333,
+        "n": 17,
+        "conf": 0.3003389537334442,
+        "acc": 0.6470588235294118
+      },
+      {
+        "lo": 0.3333333333333333,
+        "hi": 0.4,
+        "n": 11,
+        "conf": 0.36774054169654846,
+        "acc": 0.7272727272727273
+      },
+      {
+        "lo": 0.4,
+        "hi": 0.4666666666666667,
+        "n": 26,
+        "conf": 0.43513646721839905,
+        "acc": 0.6153846153846154
+      },
+      {
+        "lo": 0.4666666666666667,
+        "hi": 0.5333333333333333,
+        "n": 30,
+        "conf": 0.4948498606681824,
+        "acc": 0.7666666666666667
+      },
+      {
+        "lo": 0.5333333333333333,
+        "hi": 0.6,
+        "n": 27,
+        "conf": 0.5629494190216064,
+        "acc": 0.8518518518518519
+      },
+      {
+        "lo": 0.6,
+        "hi": 0.6666666666666666,
+        "n": 42,
+        "conf": 0.6348298788070679,
+        "acc": 0.6190476190476191
+      },
+      {
+        "lo": 0.6666666666666666,
+        "hi": 0.7333333333333333,
+        "n": 92,
+        "conf": 0.6998470425605774,
+        "acc": 0.7391304347826086
+      },
+      {
+        "lo": 0.7333333333333333,
+        "hi": 0.8,
+        "n": 131,
+        "conf": 0.7694053649902344,
+        "acc": 0.8625954198473282
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.8666666666666667,
+        "n": 190,
+        "conf": 0.8342036008834839,
+        "acc": 0.9578947368421052
+      },
+      {
+        "lo": 0.8666666666666667,
+        "hi": 0.9333333333333333,
+        "n": 331,
+        "conf": 0.9040664434432983,
+        "acc": 0.9667673716012085
+      },
+      {
+        "lo": 0.9333333333333333,
+        "hi": 1.0,
+        "n": 3173,
+        "conf": 0.9910963177680969,
+        "acc": 0.9949574535140245
+      }
+    ]
+  },
+  "per_question": {
+    "0": {
+      "question": "Does this image contain a cat? Answer with the name of the animal you see.",
+      "n": 1476,
+      "accuracy": 0.9193766937669376,
+      "raw_jev": {
+        "ece": 0.2817993658950659,
+        "brier": 0.2159331253075013,
+        "auroc": 0.2541815547147378,
+        "mean_conf": 0.6456742286682129,
+        "accuracy": 0.9193766937669376,
+        "bins": [
+          {
+            "lo": 0.0,
+            "hi": 0.06666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.06666666666666667,
+            "hi": 0.13333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.13333333333333333,
+            "hi": 0.2,
+            "n": 0
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.26666666666666666,
+            "n": 54,
+            "conf": 0.24021555483341217,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.26666666666666666,
+            "hi": 0.3333333333333333,
+            "n": 134,
+            "conf": 0.3019266128540039,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 142,
+            "conf": 0.3652152419090271,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 86,
+            "conf": 0.4278850257396698,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 32,
+            "conf": 0.4920322299003601,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 28,
+            "conf": 0.5677187442779541,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 25,
+            "conf": 0.6443536281585693,
+            "acc": 0.96
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 230,
+            "conf": 0.7123720645904541,
+            "acc": 0.9478260869565217
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 352,
+            "conf": 0.7627063989639282,
+            "acc": 0.8806818181818182
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 317,
+            "conf": 0.8327301740646362,
+            "acc": 0.8138801261829653
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 76,
+            "conf": 0.8800380825996399,
+            "acc": 0.9342105263157895
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 0
+          }
+        ]
+      },
+      "probe": {
+        "ece": 0.05132471251132363,
+        "brier": 0.04095556091811364,
+        "auroc": 0.9824315872259,
+        "mean_conf": 0.8709245324134827,
+        "accuracy": 0.9193766937669376,
+        "bins": [
+          {
+            "lo": 0.0,
+            "hi": 0.06666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.06666666666666667,
+            "hi": 0.13333333333333333,
+            "n": 61,
+            "conf": 0.1167210042476654,
+            "acc": 0.08196721311475409
+          },
+          {
+            "lo": 0.13333333333333333,
+            "hi": 0.2,
+            "n": 54,
+            "conf": 0.1590181291103363,
+            "acc": 0.3888888888888889
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.26666666666666666,
+            "n": 25,
+            "conf": 0.23208406567573547,
+            "acc": 0.68
+          },
+          {
+            "lo": 0.26666666666666666,
+            "hi": 0.3333333333333333,
+            "n": 17,
+            "conf": 0.3003389537334442,
+            "acc": 0.6470588235294118
+          },
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 11,
+            "conf": 0.36774054169654846,
+            "acc": 0.7272727272727273
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 17,
+            "conf": 0.4365420937538147,
+            "acc": 0.7647058823529411
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 14,
+            "conf": 0.4911532700061798,
+            "acc": 0.8571428571428571
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 18,
+            "conf": 0.5622182488441467,
+            "acc": 0.8888888888888888
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 9,
+            "conf": 0.6224896311759949,
+            "acc": 0.7777777777777778
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 16,
+            "conf": 0.6972075700759888,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 21,
+            "conf": 0.7658734321594238,
+            "acc": 0.9523809523809523
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 27,
+            "conf": 0.8371796011924744,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 49,
+            "conf": 0.9038533568382263,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 1137,
+            "conf": 0.9944359660148621,
+            "acc": 0.9982409850483729
+          }
+        ]
+      }
+    },
+    "1": {
+      "question": "Is there a cat in this picture? Tell me which animal is shown.",
+      "n": 1387,
+      "accuracy": 0.9524152847873107,
+      "raw_jev": {
+        "ece": 0.09185404429868904,
+        "brier": 0.05822156023974125,
+        "auroc": 0.5352579542587113,
+        "mean_conf": 0.860561192035675,
+        "accuracy": 0.9524152847873107,
+        "bins": [
+          {
+            "lo": 0.0,
+            "hi": 0.06666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.06666666666666667,
+            "hi": 0.13333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.13333333333333333,
+            "hi": 0.2,
+            "n": 0
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.26666666666666666,
+            "n": 0
+          },
+          {
+            "lo": 0.26666666666666666,
+            "hi": 0.3333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 0
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 5,
+            "conf": 0.49277082085609436,
+            "acc": 0.8
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 17,
+            "conf": 0.5768442153930664,
+            "acc": 0.6470588235294118
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 48,
+            "conf": 0.6362823843955994,
+            "acc": 0.9166666666666666
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 59,
+            "conf": 0.6987382173538208,
+            "acc": 0.9491525423728814
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 85,
+            "conf": 0.7690074443817139,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 380,
+            "conf": 0.843151867389679,
+            "acc": 0.968421052631579
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 528,
+            "conf": 0.8958587646484375,
+            "acc": 0.9356060606060606
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 265,
+            "conf": 0.9463560581207275,
+            "acc": 0.9773584905660377
+          }
+        ]
+      },
+      "probe": {
+        "ece": 0.029801943101037186,
+        "brier": 0.03638970096734297,
+        "auroc": 0.9179226022526554,
+        "mean_conf": 0.9369181394577026,
+        "accuracy": 0.9524152847873107,
+        "bins": [
+          {
+            "lo": 0.0,
+            "hi": 0.06666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.06666666666666667,
+            "hi": 0.13333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.13333333333333333,
+            "hi": 0.2,
+            "n": 0
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.26666666666666666,
+            "n": 0
+          },
+          {
+            "lo": 0.26666666666666666,
+            "hi": 0.3333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 0
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 2,
+            "conf": 0.5882388353347778,
+            "acc": 0.5
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 21,
+            "conf": 0.6376681327819824,
+            "acc": 0.42857142857142855
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 52,
+            "conf": 0.6990941762924194,
+            "acc": 0.5961538461538461
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 80,
+            "conf": 0.7697024345397949,
+            "acc": 0.825
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 103,
+            "conf": 0.8315626978874207,
+            "acc": 0.9514563106796117
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 185,
+            "conf": 0.903142511844635,
+            "acc": 0.9675675675675676
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 944,
+            "conf": 0.9896997809410095,
+            "acc": 0.9925847457627118
+          }
+        ]
+      }
+    },
+    "2": {
+      "question": "Which animal is in this photo? Answer with its name.",
+      "n": 1347,
+      "accuracy": 0.9740163325909429,
+      "raw_jev": {
+        "ece": 0.36660806468529616,
+        "brier": 0.19790365901761864,
+        "auroc": 0.49777874564459934,
+        "mean_conf": 0.6074082851409912,
+        "accuracy": 0.9740163325909429,
+        "bins": [
+          {
+            "lo": 0.0,
+            "hi": 0.06666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.06666666666666667,
+            "hi": 0.13333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.13333333333333333,
+            "hi": 0.2,
+            "n": 5,
+            "conf": 0.1883467733860016,
+            "acc": 0.8
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.26666666666666666,
+            "n": 53,
+            "conf": 0.23606353998184204,
+            "acc": 0.9622641509433962
+          },
+          {
+            "lo": 0.26666666666666666,
+            "hi": 0.3333333333333333,
+            "n": 88,
+            "conf": 0.3049182593822479,
+            "acc": 0.9772727272727273
+          },
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 94,
+            "conf": 0.368098646402359,
+            "acc": 0.9787234042553191
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 135,
+            "conf": 0.4352418780326843,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 143,
+            "conf": 0.500700831413269,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 118,
+            "conf": 0.5674960017204285,
+            "acc": 0.9745762711864406
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 111,
+            "conf": 0.6327463984489441,
+            "acc": 0.9009009009009009
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 132,
+            "conf": 0.7039213180541992,
+            "acc": 0.9545454545454546
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 191,
+            "conf": 0.7664788365364075,
+            "acc": 0.9842931937172775
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 184,
+            "conf": 0.8311538100242615,
+            "acc": 0.9728260869565217
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 86,
+            "conf": 0.8940048217773438,
+            "acc": 1.0
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 7,
+            "conf": 0.9432453513145447,
+            "acc": 1.0
+          }
+        ]
+      },
+      "probe": {
+        "ece": 0.024069780142287826,
+        "brier": 0.02341015766187123,
+        "auroc": 0.918815331010453,
+        "mean_conf": 0.9512714743614197,
+        "accuracy": 0.9740163325909429,
+        "bins": [
+          {
+            "lo": 0.0,
+            "hi": 0.06666666666666667,
+            "n": 0
+          },
+          {
+            "lo": 0.06666666666666667,
+            "hi": 0.13333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.13333333333333333,
+            "hi": 0.2,
+            "n": 0
+          },
+          {
+            "lo": 0.2,
+            "hi": 0.26666666666666666,
+            "n": 0
+          },
+          {
+            "lo": 0.26666666666666666,
+            "hi": 0.3333333333333333,
+            "n": 0
+          },
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 0
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 9,
+            "conf": 0.43248140811920166,
+            "acc": 0.3333333333333333
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 16,
+            "conf": 0.4980844259262085,
+            "acc": 0.6875
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 7,
+            "conf": 0.5576038956642151,
+            "acc": 0.8571428571428571
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 12,
+            "conf": 0.6391182541847229,
+            "acc": 0.8333333333333334
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 24,
+            "conf": 0.7032378315925598,
+            "acc": 0.875
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 30,
+            "conf": 0.7710853815078735,
+            "acc": 0.9
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 60,
+            "conf": 0.8373982310295105,
+            "acc": 0.95
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 97,
+            "conf": 0.9059363007545471,
+            "acc": 0.9484536082474226
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 1092,
+            "conf": 0.988826334476471,
+            "acc": 0.9935897435897436
+          }
+        ]
+      }
+    }
+  },
+  "mid_confidence_0.4_0.6": {
+    "raw": {
+      "n": 564,
+      "mean_prob": 0.49296435713768005,
+      "empirical_accuracy": 0.9822695035460993
+    },
+    "probe": {
+      "n": 83,
+      "mean_prob": 0.4982972741127014,
+      "empirical_accuracy": 0.7469879518072289
+    }
+  },
+  "examples": [
+    {
+      "image_id": "Abyssinian_215",
+      "breed": "abyssinian",
+      "true_species": "cat",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 0,
+      "raw_jev": 0.19745364785194397,
+      "probe": 0.9396823048591614,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_198",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Cat",
+      "correct": 0,
+      "raw_jev": 0.2337922900915146,
+      "probe": 0.9120095372200012,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_94",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Cat",
+      "correct": 0,
+      "raw_jev": 0.2603016793727875,
+      "probe": 0.8639431595802307,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "miniature_pinscher_45",
+      "breed": "miniature_pinscher",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Cat",
+      "correct": 0,
+      "raw_jev": 0.2955624461174011,
+      "probe": 0.7588762044906616,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_87",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3002006709575653,
+      "probe": 0.9999994039535522,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "english_setter_60",
+      "breed": "english_setter",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3007434904575348,
+      "probe": 0.9999853372573853,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "english_setter_24",
+      "breed": "english_setter",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30137863755226135,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_194",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30140966176986694,
+      "probe": 0.9912612438201904,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "Egyptian_Mau_67",
+      "breed": "egyptian_mau",
+      "true_species": "cat",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Cat",
+      "correct": 1,
+      "raw_jev": 0.30144721269607544,
+      "probe": 0.9658777713775635,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "saint_bernard_3",
+      "breed": "saint_bernard",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30185699462890625,
+      "probe": 0.9999996423721313,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "english_cocker_spaniel_21",
+      "breed": "english_cocker_spaniel",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30193519592285156,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "havanese_40",
+      "breed": "havanese",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3019854426383972,
+      "probe": 0.999923825263977,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "american_bulldog_36",
+      "breed": "american_bulldog",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3020607829093933,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "havanese_83",
+      "breed": "havanese",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30216196179389954,
+      "probe": 0.9999995231628418,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "miniature_pinscher_62",
+      "breed": "miniature_pinscher",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3024344742298126,
+      "probe": 0.999998927116394,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "wheaten_terrier_1",
+      "breed": "wheaten_terrier",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3025001883506775,
+      "probe": 0.9999990463256836,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "keeshond_26",
+      "breed": "keeshond",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.303024023771286,
+      "probe": 0.9999903440475464,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "newfoundland_37",
+      "breed": "newfoundland",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3031422793865204,
+      "probe": 0.9999896287918091,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "miniature_pinscher_31",
+      "breed": "miniature_pinscher",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3044620752334595,
+      "probe": 0.9999995231628418,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "basset_hound_194",
+      "breed": "basset_hound",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3047500550746918,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "german_shorthaired_65",
+      "breed": "german_shorthaired",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3048674166202545,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "german_shorthaired_49",
+      "breed": "german_shorthaired",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30487218499183655,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "yorkshire_terrier_73",
+      "breed": "yorkshire_terrier",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3048763573169708,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "american_bulldog_44",
+      "breed": "american_bulldog",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "dog",
+      "correct": 1,
+      "raw_jev": 0.3050000071525574,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "havanese_91",
+      "breed": "havanese",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30536213517189026,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "shiba_inu_76",
+      "breed": "shiba_inu",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3054516911506653,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "havanese_32",
+      "breed": "havanese",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30549949407577515,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "wheaten_terrier_70",
+      "breed": "wheaten_terrier",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.305734783411026,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "american_bulldog_47",
+      "breed": "american_bulldog",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3062092065811157,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_27",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3067222833633423,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "saint_bernard_74",
+      "breed": "saint_bernard",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Pug",
+      "correct": 1,
+      "raw_jev": 0.3068024516105652,
+      "probe": 0.9610682129859924,
+      "n_tokens": 2
+    },
+    {
+      "image_id": "english_setter_21",
+      "breed": "english_setter",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "dog",
+      "correct": 1,
+      "raw_jev": 0.3068619966506958,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_50",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "dog",
+      "correct": 1,
+      "raw_jev": 0.30687329173088074,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "shiba_inu_64",
+      "breed": "shiba_inu",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30733758211135864,
+      "probe": 0.9999991655349731,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "saint_bernard_45",
+      "breed": "saint_bernard",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "dog",
+      "correct": 1,
+      "raw_jev": 0.3076636493206024,
+      "probe": 0.9999998807907104,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "japanese_chin_58",
+      "breed": "japanese_chin",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.30933311581611633,
+      "probe": 0.9999247789382935,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "yorkshire_terrier_57",
+      "breed": "yorkshire_terrier",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "dog",
+      "correct": 1,
+      "raw_jev": 0.30955129861831665,
+      "probe": 1.0,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "chihuahua_85",
+      "breed": "chihuahua",
+      "true_species": "dog",
+      "question": "Does this image contain a cat? Answer with the name of the a",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3095896542072296,
+      "probe": 0.9999996423721313,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "keeshond_64",
+      "breed": "keeshond",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3097653388977051,
+      "probe": 0.9966451525688171,
+      "n_tokens": 1
+    },
+    {
+      "image_id": "yorkshire_terrier_91",
+      "breed": "yorkshire_terrier",
+      "true_species": "dog",
+      "question": "Which animal is in this photo? Answer with its name.",
+      "answer": "Dog",
+      "correct": 1,
+      "raw_jev": 0.3102324306964874,
+      "probe": 0.9999880790710449,
+      "n_tokens": 1
+    }
+  ]
+}
