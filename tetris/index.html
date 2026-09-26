@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>jevomir plays Tetris</title>
+<style>
+:root { --bg: #f4f3ef; --panel: #fff; --ink: #1c1b18; --muted: #6b6860; --line: #e2dfd7; --accent: #2f6fdf; --win: #1f9d6b; --bar: #e4e1d9; --err: #c4412f; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151513; --panel: #1f1f1c; --ink: #ecebe6; --muted: #9a978e; --line: #33322e; --accent: #5b8ff0; --win: #3cc48f; --bar: #34332f; --err: #ef6d5a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
+main { display: flex; gap: 1rem; padding: 1rem; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+iframe { width: 640px; height: 640px; border: 0; border-radius: 12px; background: #fff; flex: none; }
+aside { width: 440px; max-width: 100%; display: flex; flex-direction: column; gap: .8rem; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1rem; }
+h1 { font-size: 1.25rem; margin: 0 0 .2rem; }
+h2 { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 .5rem; }
+.muted { color: var(--muted); }
+.row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+button { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: .55rem 1rem; background: var(--accent); color: #fff; cursor: pointer; }
+button.ghost { background: none; color: var(--ink); border: 1px solid var(--line); font-weight: 400; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; text-align: center; }
+.stats b { display: block; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.stats span { font-size: .75rem; color: var(--muted); }
+#gallery { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+#gallery figure { margin: 0; cursor: pointer; border-radius: 8px; outline: 2px solid transparent; }
+#gallery figure.sel { outline-color: var(--accent); }
+#gallery canvas { width: 100%; image-rendering: pixelated; border-radius: 8px; display: block; background: #111; }
+#gallery figcaption { font-size: .75rem; font-family: ui-monospace, monospace; margin: .2rem .1rem 0; }
+#gallery figcaption b { color: var(--win); }
+.round { font-size: .8rem; font-family: ui-monospace, monospace; margin: .15rem 0; }
+.round b { color: var(--win); }
+.bars { margin-top: .5rem; }
+.bar-row { display: grid; grid-template-columns: 1.6rem 1fr 3.4rem; gap: .4rem; align-items: center; font-size: .8rem; margin: 2px 0; }
+.bar { height: 7px; background: var(--bar); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--muted); }
+.bar-row.win .bar i { background: var(--win); }
+.bar-row.win { font-weight: 600; }
+.num { text-align: right; font-family: ui-monospace, monospace; }
+#status.err { color: var(--err); }
+</style>
+</head>
+<body>
+<main>
+  <iframe id="game" src="game/index.html" title="Tetris"></iframe>
+  <aside>
+    <section class="panel">
+      <h1>jevomir plays Tetris</h1>
+      <p class="muted" style="margin:.2rem 0 .7rem">For every new piece, each reachable placement is drawn as a lettered panel.
+        Qwen3.5-4B picks the best panel in one forward pass per image; with more than 8 placements,
+        group winners meet in a final.</p>
+      <div class="row">
+        <button id="start">Start</button>
+        <button class="ghost" id="pause">Pause</button>
+        <label><input type="checkbox" id="auto" checked> auto-restart</label>
+        <label title="The model tends to prefer some letters; scoring a reversed copy and averaging cancels that out"><input type="checkbox" id="debias" checked> both orders</label>
+      </div>
+      <details style="margin-top:.6rem"><summary class="muted">Question sent to the model</summary>
+        <textarea id="question" rows="5" style="width:100%;font:inherit;margin-top:.4rem"></textarea></details>
+    </section>
+    <section class="panel">
+      <div class="stats">
+        <div><b id="s-pieces">0</b><span>pieces</span></div>
+        <div><b id="s-rows">0</b><span>rows</span></div>
+        <div><b id="s-calls">0</b><span>API calls</span></div>
+        <div><b id="s-ms">–</b><span>ms / piece</span></div>
+      </div>
+      <p class="muted" style="margin:.6rem 0 0">Games: <span id="s-games">0</span> · best: <span id="s-best">0</span> rows · <span id="status">idle</span></p>
+    </section>
+    <section class="panel">
+      <h2>Last decision <span id="summary" style="text-transform:none;letter-spacing:0;font-weight:400"></span></h2>
+      <div id="gallery"></div>
+      <div class="bars" id="bars"></div>
+    </section>
+  </aside>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const GROUP = 8;             // panels per image (4 x 2)
+const CELL = 10;             // px per block in a panel
+const W = 448, H = 448,      // the API letterboxes to 448 x 448, so larger images add nothing
+      PW = W / 4, PH = H / 2;
+const LETTERS = 'ABCDEFGHIJKLMNOP';
+const DEFAULT_QUESTION = 'This is Tetris. Each lettered panel shows the same board after dropping the new piece ' +
+  '(magenta) in a different place; gray blocks were already there, and rows outlined in green would be cleared. ' +
+  'Which panel leaves the best board: no empty cells covered by blocks, a low and flat stack, and more cleared rows?';
+
+$('question').value = DEFAULT_QUESTION;
+let g = null;                // the game's window
+let enabled = false, busy = false, lastPiece = null, stopped = false;
+const stats = { pieces: 0, calls: 0, games: 0, best: 0, ms: [] };
+
+function attach() {
+  const w = $('game').contentWindow;
+  if (g === w || !w || typeof w.update !== 'function') return;
+  g = w;
+  // No gravity: pieces move only through the actions jevomir queues, so thinking time is free.
+  const update = g.update;
+  g.update = () => update(0);
+}
+$('game').onload = attach;
+attach();                    // in case the game loaded before this script ran
+
+// --- placements -----------------------------------------------------------------------
+// Every placement reachable from the spawn position by rotating in place, moving
+// sideways at the spawn row and dropping, deduplicated by the cells it fills.
+function placements() {
+  const cur = g.current, type = cur.type, seen = new Set(), out = [];
+  for (let rot = 0, dir = cur.dir; rot < 4; rot++) {
+    if (rot > 0) {
+      const next = (dir + 1) % 4;
+      if (g.occupied(type, cur.x, cur.y, next)) break;   // the game's rotate() would fail here too
+      dir = next;
+    }
+    for (let tx = -3; tx < g.nx; tx++) {
+      let x = cur.x, ok = !g.occupied(type, x, cur.y, dir);
+      while (ok && x !== tx) { x += Math.sign(tx - x); ok = !g.occupied(type, x, cur.y, dir); }
+      if (!ok) continue;
+      let y = cur.y;
+      while (!g.occupied(type, tx, y + 1, dir)) y++;
+      const cells = [];
+      g.eachblock(type, tx, y, dir, (cx, cy) => cells.push([cx, cy]));
+      const key = cells.map(c => c.join(',')).sort().join(' ');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ rot, x: tx, cells, cleared: clearedRows(cells) });
+    }
+  }
+  return out;
+}
+function clearedRows(cells) {
+  const rows = [];
+  for (const y of new Set(cells.map(c => c[1]))) {
+    let full = true;
+    for (let x = 0; x < g.nx; x++) if (!g.getBlock(x, y) && !cells.some(c => c[0] === x && c[1] === y)) full = false;
+    if (full) rows.push(y);
+  }
+  return rows;
+}
+
+// --- drawing --------------------------------------------------------------------------
+function drawGroup(ctx, group, winner = -1) {
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, W, H);
+  const ox = (PW - g.nx * CELL) / 2, oy = PH - g.ny * CELL - 4;
+  group.forEach((p, i) => {
+    const px = (i % 4) * PW, py = Math.floor(i / 4) * PH;
+    ctx.save(); ctx.translate(px + ox, py + oy);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, g.nx * CELL, g.ny * CELL);
+    for (let y = 0; y < g.ny; y++) for (let x = 0; x < g.nx; x++) {
+      ctx.strokeStyle = '#222'; ctx.strokeRect(x * CELL + .5, y * CELL + .5, CELL - 1, CELL - 1);
+      if (g.getBlock(x, y)) { ctx.fillStyle = '#9a9a9a'; ctx.fillRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2); }
+    }
+    ctx.fillStyle = '#ff2fd0';
+    for (const [x, y] of p.cells) ctx.fillRect(x * CELL, y * CELL, CELL, CELL);
+    ctx.strokeStyle = '#2fe070'; ctx.lineWidth = 2;
+    for (const y of p.cleared) ctx.strokeRect(1, y * CELL + 1, g.nx * CELL - 2, CELL - 2);
+    ctx.lineWidth = 1; ctx.strokeStyle = '#666'; ctx.strokeRect(.5, .5, g.nx * CELL - 1, g.ny * CELL - 1);
+    ctx.restore();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 16px system-ui, sans-serif'; ctx.textBaseline = 'top';
+    ctx.fillText(LETTERS[i], px + ox, py + 3);
+    if (i === winner) { ctx.strokeStyle = '#2fe070'; ctx.lineWidth = 3; ctx.strokeRect(px + 1.5, py + 1.5, PW - 3, PH - 3); ctx.lineWidth = 1; }
+  });
+}
+
+// --- asking jevomir -------------------------------------------------------------------
+const work = Object.assign(document.createElement('canvas'), { width: W, height: H });
+async function ask(group) {
+  drawGroup(work.getContext('2d'), group);
+  const options = group.map((p, i) => `Panel ${LETTERS[i]}` + (p.cleared.length ? ` (clears ${p.cleared.length} row${p.cleared.length > 1 ? 's' : ''})` : ''));
+  const r = await fetch('/api/score', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(90000), body: JSON.stringify({ question: $('question').value.trim() || DEFAULT_QUESTION, options, images: [work.toDataURL('image/png')] }) });
+  const j = await r.json();
+  if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail));
+  stats.calls++;
+  return j;
+}
+// Probability per placement of the group; with "both orders", the average of the given
+// order and the reversed one, which cancels a preference for particular letters.
+async function pick(group) {
+  const fwd = await ask(group);
+  let probs = fwd.options.map(o => o.probability);
+  if ($('debias').checked) {
+    const rev = await ask([...group].reverse());
+    probs = probs.map((p, i) => (p + rev.options[group.length - 1 - i].probability) / 2);
+  }
+  const win = probs.indexOf(Math.max(...probs));
+  return { win, probs, calibrated: fwd.calibrated_p_correct, flipped: fwd.prediction.index !== win };
+}
+function split(list) {
+  const n = Math.ceil(list.length / GROUP), size = Math.ceil(list.length / n), out = [];
+  for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
+  return out;
+}
+
+async function decide() {
+  busy = true;
+  const t0 = performance.now();
+  try {
+    let pool = placements(), rounds = [];
+    const total = pool.length;
+    if (!pool.length) return;
+    while (pool.length > 1) {
+      const winners = [];
+      for (const group of split(pool)) {
+        if (group.length === 1) { winners.push(group[0]); continue; }
+        const res = await pick(group);
+        winners.push(group[res.win]);
+        rounds.push({ group, res, final: pool.length <= GROUP });
+      }
+      pool = winners;
+    }
+    if (!enabled || !g.playing) return;
+    play(pool[0]);
+    stats.pieces++;
+    stats.ms.push(performance.now() - t0);
+    showDecision(rounds, total);
+    setStatus(`playing`);
+  } catch (e) {
+    setStatus('API error: ' + e.message + ' — retrying', true);
+    lastPiece = null;                      // retry the same piece
+    await new Promise(ok => setTimeout(ok, 2000));
+  } finally {
+    busy = false;
+    renderStats();
+  }
+}
+
+// Execute with the game's own actions: rotations, sideways moves, then drop until it locks.
+function play(p) {
+  const D = g.DIR, a = [];
+  for (let i = 0; i < p.rot; i++) a.push(D.UP);
+  const dx = p.x - g.current.x;
+  for (let i = 0; i < Math.abs(dx); i++) a.push(dx < 0 ? D.LEFT : D.RIGHT);
+  for (let i = 0; i <= g.ny; i++) a.push(D.DOWN);
+  g.actions.push(...a);
+}
+
+// --- UI -------------------------------------------------------------------------------
+// Every image the model saw for this piece: each group, then the final between group winners.
+function showDecision(rounds, total) {
+  const calls = rounds.length * ($('debias').checked ? 2 : 1);
+  $('summary').textContent = `· ${total} placement${total > 1 ? 's' : ''}, ${calls} API call${calls === 1 ? '' : 's'}`;
+  $('gallery').innerHTML = rounds.length ? '' : '<p class="round muted">only one placement, no call needed</p>';
+  $('bars').innerHTML = '';
+  rounds.forEach((r, i) => {
+    const { win, probs, flipped, calibrated } = r.res;
+    const fig = document.createElement('figure');
+    const canvas = Object.assign(document.createElement('canvas'), { width: W, height: H });
+    drawGroup(canvas.getContext('2d'), r.group, win);
+    const name = rounds.length === 1 ? 'all' : r.final ? 'final' : `group ${i + 1}`;
+    const note = $('debias').checked ? (flipped ? ' · order changed the pick' : '') : ` · calibrated ${(calibrated * 100).toFixed(0)}%`;
+    fig.innerHTML = `<figcaption>${name}: ${r.group.length} panels → <b>${LETTERS[win]}</b> · p ${(probs[win] * 100).toFixed(0)}%${note}</figcaption>`;
+    fig.prepend(canvas);
+    fig.onclick = () => select(fig, r);
+    $('gallery').append(fig);
+  });
+  const lastFig = $('gallery').lastElementChild;
+  if (rounds.length) select(lastFig, rounds[rounds.length - 1]);
+}
+function select(fig, round) {
+  $('gallery').querySelectorAll('figure').forEach(f => f.classList.toggle('sel', f === fig));
+  const { win, probs } = round.res;
+  $('bars').innerHTML = probs.map((p, i) => `<div class="bar-row${i === win ? ' win' : ''}">
+    <span>${LETTERS[i]}</span><div class="bar"><i style="width:${(p * 100).toFixed(1)}%"></i></div>
+    <span class="num">${(p * 100).toFixed(1)}%</span></div>`).join('');
+}
+function setStatus(text, err = false) { $('status').textContent = text; $('status').className = err ? 'err' : ''; }
+function renderStats() {
+  $('s-pieces').textContent = stats.pieces;
+  $('s-rows').textContent = g ? g.rows : 0;
+  $('s-calls').textContent = stats.calls;
+  const recent = stats.ms.slice(-20);
+  $('s-ms').textContent = recent.length ? Math.round(recent.reduce((a, b) => a + b, 0) / recent.length) : '–';
+  $('s-games').textContent = stats.games;
+  $('s-best').textContent = stats.best;
+}
+
+function start() {
+  if (!g) return;
+  enabled = true; stopped = false; lastPiece = null;
+  g.play(); stats.games++;
+  $('pause').textContent = 'Pause';
+  setStatus('playing');
+}
+$('start').onclick = start;
+$('pause').onclick = () => {
+  if (!g || !g.playing) return;
+  enabled = !enabled;
+  $('pause').textContent = enabled ? 'Pause' : 'Resume';
+  setStatus(enabled ? 'playing' : 'paused');
+  if (enabled) lastPiece = null;
+};
+
+(function loop() {
+  if (g && enabled && !busy) {
+    if (g.playing && g.current !== lastPiece && g.actions.length === 0) {
+      lastPiece = g.current;
+      decide();
+    } else if (!g.playing && !stopped) {
+      stopped = true;
+      stats.best = Math.max(stats.best, g.rows);
+      renderStats();
+      setStatus(`game over after ${g.rows} rows`);
+      if ($('auto').checked) setTimeout(() => { if (stopped && enabled) start(); }, 2500);
+    }
+  }
+  requestAnimationFrame(loop);
+})();
+fetch('/api/info').then(r => r.ok ? setStatus('ready — press Start') : r.json().then(j => setStatus('API: ' + j.detail, true)))
+  .catch(e => setStatus('API unreachable: ' + e.message, true));
+</script>
+</body>
+</html>

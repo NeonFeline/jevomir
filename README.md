@@ -76,3 +76,5 @@ python api_server.py --probe artifacts/cauldron     # http://127.0.0.1:8100
 
 To reach it from other machines, expose the port with a tunnel such as `ngrok http 8100`.
 A free ngrok tunnel drops connections above about 100 requests a minute.
+
+`tetris/` lets the model play Tetris live through the API; see [tetris/README.md](tetris/README.md).

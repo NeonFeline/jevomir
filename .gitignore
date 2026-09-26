@@ -6,3 +6,4 @@ artifacts/**/*.log
 artifacts/features_*.pt
 artifacts/**/features_*.pt
 .uv/
+tetris/.api-key
