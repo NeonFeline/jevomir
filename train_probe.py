@@ -246,7 +246,7 @@ def main():
         if 0.3 < raw[j] < 0.7 or (labels[j] == 0 and probe[j] > 0.5):
             m = meta_te[i]
             examples.append({
-                "image_id": m["image_id"], "breed": m["breed"], "true_species": m["true_species"],
+                "image_id": m["image_id"], "breed": m.get("breed"), "true_species": m.get("true_species"),
                 "question": m["question"][:60], "answer": m["answer"][:80], "correct": int(m["correct"]),
                 "raw_jev": float(raw[j]), "probe": float(probe[j]), "n_tokens": m.get("n_tokens", 0),
             })

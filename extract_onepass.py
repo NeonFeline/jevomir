@@ -33,7 +33,15 @@ PROTOCOLS = [
 
 
 def cand_ids(tokenizer, word):
-    return tokenizer.encode(word, add_special_tokens=False) + tokenizer.encode(" " + word, add_special_tokens=False)
+    """Next-token ids for both surface forms. Each form must be one token: summing the
+    first-position mass of every subtoken of a multi-token word is not P(word)."""
+    ids = []
+    for form in (word, " " + word):
+        encoded = tokenizer.encode(form, add_special_tokens=False)
+        if len(encoded) != 1:
+            raise ValueError(f"Candidate {form!r} is {len(encoded)} tokens; one-pass readout needs one")
+        ids.append(encoded[0])
+    return ids
 
 
 def auto_layers(model):
