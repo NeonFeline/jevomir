@@ -8,11 +8,14 @@ so all subsets share one prompt format and one readout (option letters).
 
 from __future__ import annotations
 
+import io
 import random
 import re
 from collections import defaultdict
+from pathlib import Path
 
-from datasets import load_dataset
+import pyarrow.parquet as pq
+from PIL import Image
 
 CAULDRON = "HuggingFaceM4/the_cauldron"
 CAULDRON_REVISION = "847a98a779b1652d65111daf20c972dfcd333605"
@@ -152,21 +155,38 @@ def image_key(images) -> str:
     return f"{int(''.join('1' if b else '0' for b in bits), 2):016x}"
 
 
-def iter_items(subset: str, limit: int, seed: int = 0, per_image: int = 3):
-    """Yield up to `limit` usable items, at most `per_image` per image, in a seeded stream order."""
-    ds = load_dataset(CAULDRON, subset, revision=CAULDRON_REVISION, split="train", streaming=True)
-    ds = ds.shuffle(seed=seed, buffer_size=2000)
+def _descriptive_pools(rows, subset):
+    """All descriptive answers of the subset, grouped by two-word question stem."""
+    pools = defaultdict(set)
+    for _, _, texts in rows:
+        for qa in texts:
+            converted = convert(subset, qa["user"], qa["assistant"])
+            if converted and converted[2] == DESCRIPTIVE:
+                pools[_stem(converted[0])].add(converted[1][0])
+    return {stem: sorted(answers) for stem, answers in pools.items()}
+
+
+def build_index(subset: str, root: Path, limit: int, seed: int = 0, per_image: int = 3):
+    """Select up to `limit` usable items from local parquet shards without decoding images.
+
+    Reads only the text column to choose rows (seeded shuffle, at most `per_image` questions
+    per image), then fetches the raw image bytes of the chosen rows only.
+    """
+    files = sorted((Path(root) / subset).glob("*.parquet"))
+    if not files:
+        raise FileNotFoundError(f"No parquet shards for {subset} under {root}")
+    rows = []
+    for file_index, path in enumerate(files):
+        texts = pq.read_table(path, columns=["texts"]).column("texts").to_pylist()
+        rows += [(file_index, row, t) for row, t in enumerate(texts)]
+    pools = _descriptive_pools(rows, subset)
     rng = random.Random(seed)
-    # Answers seen so far, by question stem ("what color", "what is"), for descriptive distractors.
-    pools = defaultdict(list)
-    produced = 0
-    for row_index, row in enumerate(ds):
-        images = [img.convert("RGB") for img in row["images"] if img is not None]
-        if not images:
-            continue
+    rng.shuffle(rows)
+
+    items = []
+    for file_index, row, texts in rows:
         taken = 0
-        key = image_key(images)
-        for qa_index, qa in enumerate(row["texts"]):
+        for qa_index, qa in enumerate(texts):
             converted = convert(subset, qa["user"], qa["assistant"])
             if converted is None:
                 continue
@@ -174,33 +194,45 @@ def iter_items(subset: str, limit: int, seed: int = 0, per_image: int = 3):
             kind = answer_kind(options)
             if answer == DESCRIPTIVE:
                 correct = options[0]
-                pool = pools[_stem(question)]
-                others = sorted({a for a in pool if a != correct})
-                if correct not in pool:
-                    pool.append(correct)
+                others = [a for a in pools.get(_stem(question), []) if a != correct]
                 if not others:
                     continue
-                distractor = rng.choice(others)
-                options = [correct.capitalize(), distractor.capitalize()]
+                options = [correct.capitalize(), rng.choice(others).capitalize()]
                 if rng.random() < 0.5:
                     options.reverse()
                 answer, kind = options.index(correct.capitalize()), "descriptive"
             if not 2 <= len(options) <= len(LETTERS) or needs_reading(question, options):
                 continue
-            yield {
-                "subset": subset,
-                "image_id": f"{subset}/{row_index}",
-                "image_key": key,
-                "qa_index": qa_index,
-                "images": images,
-                "question": question,
-                "options": options,
-                "answer": answer,
-                "answer_kind": kind,
-            }
-            produced += 1
+            items.append({
+                "subset": subset, "image_id": f"{subset}/{file_index}:{row}", "file": file_index,
+                "row": row, "qa_index": qa_index, "question": question, "options": options,
+                "answer": answer, "answer_kind": kind,
+            })
             taken += 1
-            if produced >= limit:
-                return
             if taken >= per_image:
                 break
+        if len(items) >= limit:
+            break
+    items = items[:limit]
+
+    by_file = defaultdict(list)
+    for item in items:
+        by_file[item["file"]].append(item["row"])
+    image_bytes = {}
+    for file_index, wanted in by_file.items():
+        wanted = sorted(set(wanted))
+        column = pq.read_table(files[file_index], columns=["images"]).column("images").take(wanted).to_pylist()
+        for row, images in zip(wanted, column):
+            image_bytes[(file_index, row)] = [img["bytes"] for img in images if img and img.get("bytes")]
+    for item in items:
+        item["image_bytes"] = image_bytes[(item["file"], item["row"])]
+    return [item for item in items if item["image_bytes"]]
+
+
+def decode(item):
+    """Decode an index item's images (worker side) and attach its perceptual image key."""
+    images = [Image.open(io.BytesIO(b)).convert("RGB") for b in item["image_bytes"]]
+    decoded = {k: v for k, v in item.items() if k != "image_bytes"}
+    decoded["images"] = images
+    decoded["image_key"] = image_key(images)
+    return decoded

@@ -4,12 +4,13 @@ Writes one create-only shard per subset: <out>/<subset>.pt
 
 Throughput: the Qwen3.5 linear-attention Triton kernels re-tune for every new input shape,
 so images are letterboxed to one square size and sequences padded to a fixed multiple.
-A background thread streams data and runs CPU preprocessing while the GPU scores.
+Shards are read from a local copy (download them first); DataLoader workers decode images
+and run the processor, so the GPU loop only does forward passes. Only the last position's
+logits are computed.
 """
 
 import argparse
-import queue
-import threading
+import os
 import time
 from pathlib import Path
 
@@ -19,7 +20,9 @@ from qwen_vl_utils import process_vision_info
 from tqdm.auto import tqdm
 from transformers import AutoModelForImageTextToText, AutoProcessor
 
-from cauldron_tasks import CAULDRON_REVISION, LETTERS, SUBSETS, iter_items
+from torch.utils.data import DataLoader
+
+from cauldron_tasks import CAULDRON_REVISION, LETTERS, SUBSETS, build_index, decode
 from extract_onepass import auto_layers
 
 MODEL_REVISION = "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"
@@ -90,7 +93,7 @@ def forward_batch(model, inputs, layers, ids):
 
     handles = [model.model.language_model.layers[l].register_forward_hook(make_hook(l)) for l in layers]
     try:
-        logits = model(**inputs).logits[:, -1, :].float()
+        logits = model(**inputs, logits_to_keep=1).logits[:, -1, :].float()
     finally:
         for h in handles:
             h.remove()
@@ -99,28 +102,28 @@ def forward_batch(model, inputs, layers, ids):
     return letter_logits, states
 
 
-def prefetch(subset, args, processor, out_queue):
-    """Producer: stream items, group into batches, preprocess, hand over to the GPU loop."""
-    try:
-        batch = []
-        for item in iter_items(subset, args.limit, seed=args.seed):
-            batch.append(item)
-            if len(batch) == args.batch:
-                out_queue.put((batch, prepare(processor, batch, args.image_size, args.pad_multiple)))
-                batch = []
-        if batch:
-            out_queue.put((batch, prepare(processor, batch, args.image_size, args.pad_multiple)))
-    except Exception as error:  # surface producer failures in the main thread
-        out_queue.put(error)
-    out_queue.put(None)
+class Collate:
+    """Worker side: decode images, letterbox, template and tokenize one batch."""
+
+    def __init__(self, processor, image_size, pad_multiple):
+        self.processor, self.image_size, self.pad_multiple = processor, image_size, pad_multiple
+
+    def __call__(self, batch):
+        items = [decode(item) for item in batch]
+        inputs = prepare(self.processor, items, self.image_size, self.pad_multiple)
+        meta = [{k: v for k, v in it.items() if k != "images"} | {"n_images": len(it["images"])} for it in items]
+        return meta, dict(inputs)
 
 
 def main():
+    os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, required=True, help="new directory for per-subset shards")
+    ap.add_argument("--data", type=Path, default=Path.home() / "cauldron", help="local Cauldron parquet copy")
     ap.add_argument("--subsets", nargs="+", default=SUBSETS)
     ap.add_argument("--limit", type=int, default=300, help="items per subset")
-    ap.add_argument("--batch", type=int, default=32)
+    ap.add_argument("--batch", type=int, default=64)
+    ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--image-size", type=int, default=448)
     ap.add_argument("--pad-multiple", type=int, default=128)
     ap.add_argument("--seed", type=int, default=0)
@@ -135,14 +138,13 @@ def main():
     for subset in args.subsets:
         records, states_all = [], []
         started = time.perf_counter()
-        batches = queue.Queue(maxsize=4)
-        producer = threading.Thread(target=prefetch, args=(subset, args, processor, batches), daemon=True)
-        producer.start()
-        pbar = tqdm(total=args.limit, desc=subset)
-        while (got := batches.get()) is not None:
-            if isinstance(got, Exception):
-                raise got
-            batch, inputs = got
+        items = build_index(subset, args.data, args.limit, seed=args.seed)
+        indexed = time.perf_counter() - started
+        loader = DataLoader(items, batch_size=args.batch, num_workers=args.workers, pin_memory=True,
+                            collate_fn=Collate(processor, args.image_size, args.pad_multiple),
+                            prefetch_factor=4, persistent_workers=False)
+        pbar = tqdm(total=len(items), desc=subset, mininterval=10)
+        for batch, inputs in loader:
             logits, states = forward_batch(model, inputs, layers, ids)
             for it, lg, st in zip(batch, logits, states):
                 k = len(it["options"])
@@ -153,12 +155,10 @@ def main():
                     "qa_index": it["qa_index"], "question": it["question"], "options": it["options"],
                     "answer": it["answer"], "answer_kind": it["answer_kind"], "pred": pred,
                     "probs": probs.tolist(), "conf": float(probs[pred]), "correct": int(pred == it["answer"]),
-                    "n_images": len(it["images"]),
+                    "n_images": it["n_images"],
                 })
                 states_all.append(st)
             pbar.update(len(batch))
-            pbar.set_postfix(acc=round(sum(r["correct"] for r in records) / len(records), 3))
-        producer.join()
         pbar.close()
         elapsed = time.perf_counter() - started
         torch.save({
@@ -168,7 +168,7 @@ def main():
             "seconds": elapsed, "meta": records, "prompt_states": torch.stack(states_all),
         }, args.out / f"{subset}.pt")
         acc = sum(r["correct"] for r in records) / max(1, len(records))
-        print(f"{subset}: {len(records)} items, acc {acc:.3f}, {elapsed:.0f}s "
+        print(f"{subset}: {len(records)} items, acc {acc:.3f}, {elapsed:.0f}s (index {indexed:.0f}s) "
               f"({len(records) / elapsed:.1f} items/s)", flush=True)
 
 

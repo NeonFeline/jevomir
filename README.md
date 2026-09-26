@@ -53,6 +53,7 @@ image hash, so shared COCO photos never straddle train/test, and `vsr` is held o
 ```bash
 pip install flash-linear-attention   # fast Qwen3.5 kernels; needs python3.x-dev headers
 python audit_filter.py 2000
-CUDA_VISIBLE_DEVICES=0 python extract_cauldron.py --out runs/cauldron-001 --limit 50000 --batch 32
+python download_cauldron.py
+CUDA_VISIBLE_DEVICES=0 python extract_cauldron.py --out runs/cauldron-001 --limit 50000 --batch 64 --workers 12
 python train_probe_cauldron.py --features runs/cauldron-001 --out runs/probe-001 --holdout-subsets vsr
 ```
