@@ -6,6 +6,7 @@ annotated-doc==0.0.5
 anyio==4.15.1
 attrs==26.1.0
 av==18.1.0
+bitsandbytes==0.50.2
 certifi==2026.7.22
 charset-normalizer==3.5.1
 click==8.5.0
@@ -17,7 +18,10 @@ cuda-toolkit==12.8.1
 cycler==0.12.1
 datasets==5.0.1
 dill==0.4.1
+einops==0.8.2
 filelock==3.32.3
+fla-core==0.5.2
+flash-linear-attention==0.5.2
 fonttools==4.66.0
 frozenlist==1.8.0
 fsspec==2026.6.0
@@ -57,6 +61,7 @@ nvidia-nvshmem-cu12==3.4.5
 nvidia-nvtx-cu12==12.8.90
 packaging==26.3
 pandas==3.0.6
+peft==0.21.0
 pillow==12.3.0
 propcache==0.5.4
 psutil==7.2.2

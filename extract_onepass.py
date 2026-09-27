@@ -66,19 +66,24 @@ def load_model(model_id=MODEL, device="cuda"):
 
 @torch.inference_mode()
 def forward_batch(model, processor, images, question, layers, ids_pos, ids_neg):
-    messages = [
-        [{"role": "user", "content": [
-            {"type": "image", "image": img},
-            {"type": "text", "text": question},
-        ]}]
-        for img in images
-    ]
+    """Score one prompt per batch. `images` may contain None entries -> text-only prompt."""
+    messages = []
+    for img in images:
+        content = []
+        if img is not None:
+            content.append({"type": "image", "image": img})
+        content.append({"type": "text", "text": question})
+        messages.append([{"role": "user", "content": content}])
     texts = [
         processor.apply_chat_template(m, tokenize=False, add_generation_prompt=True, enable_thinking=False)
         for m in messages
     ]
-    image_inputs, _ = process_vision_info(messages)
-    inputs = processor(text=texts, images=image_inputs, return_tensors="pt", padding=True)
+    has_images = any(img is not None for img in images)
+    if has_images:
+        image_inputs, _ = process_vision_info(messages)
+        inputs = processor(text=texts, images=image_inputs, return_tensors="pt", padding=True)
+    else:
+        inputs = processor(text=texts, return_tensors="pt", padding=True)
     inputs = {k: (v.to("cuda") if torch.is_tensor(v) else v) for k, v in inputs.items()}
 
     captured = {}
