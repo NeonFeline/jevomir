@@ -4,6 +4,7 @@ One forward pass per request with the same prompt, image letterboxing and readou
 extract_cauldron.py, then the calibration probe trained on its hidden states.
 
     JEVOMIR_API_KEY=... python api_server.py --probe runs/probe-002 --port 8100
+    JEVOMIR_API_KEY=... python api_server.py --model runs/X/final-rft1/model --probe runs/X/head
 
 Auth: `Authorization: Bearer <key>` or `X-API-Key: <key>` on every /v1 endpoint.
 Interactive schema: /docs (no key needed to read it; every call still needs the key).
@@ -160,13 +161,16 @@ def score_upload(question: str = Form(..., max_length=MAX_QUESTION_CHARS),
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--probe", type=Path, required=True, help="run directory holding probe.pt and metrics.json")
+    ap.add_argument("--model", default="Qwen/Qwen3.5-4B",
+                    help="HF id or a merged fine-tuned model directory; the probe must be trained on this model")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8100)
     args = ap.parse_args()
     if len(os.environ.get("JEVOMIR_API_KEY", "")) < 32:
         raise SystemExit("Set JEVOMIR_API_KEY to a random secret of at least 32 characters")
 
-    State.model, State.processor = load_model()
+    local = Path(args.model).is_dir()
+    State.model, State.processor = load_model(args.model, revision=None if local else MODEL_REVISION)
     State.ids = letter_ids(State.processor.tokenizer)
     State.ckpt = torch.load(args.probe / "probe.pt", map_location="cpu", weights_only=False)
     State.layers = State.ckpt["layers"]
@@ -174,7 +178,7 @@ def main():
     State.probe.load_state_dict({k: v.cpu() for k, v in State.ckpt["state_dict"].items()})
     State.probe.eval()
     State.info = {
-        "model": {"source": "Qwen/Qwen3.5-4B", "revision": MODEL_REVISION, "dtype": "bfloat16",
+        "model": {"source": args.model, "revision": None if local else MODEL_REVISION, "dtype": "bfloat16",
                   "image_size": State.image_size, "layers": State.layers},
         "probe": {"run": args.probe.name},
     }
